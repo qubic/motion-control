@@ -17,8 +17,9 @@ func main() {
         log.Fatalf("error opening file: %v", err)
     }
     defer f.Close()
+    logger := log.New(f, "[martini]", log.LstdFlags)
     m := martini.Classic()
-    m.Map(log.New(f, "[martini]", log.LstdFlags))
+    m.Map(logger)
     m.Use(render.Renderer())
     m.Get("/", func(r render.Render) {
         if _, err := os.Stat(motionPidFile); err == nil {
@@ -31,9 +32,9 @@ func main() {
         cmd := exec.Command("service", "motion", "stop")
         err := cmd.Run()
         if err != nil {
-            log.Println(err)
+            logger.Println(err)
         } else {
-            log.Println("Stop motion from motion-control")
+            logger.Println("Motion has been stopped")
         }
         http.Redirect(res, req, "/", http.StatusSeeOther)
     })
@@ -41,9 +42,9 @@ func main() {
         cmd := exec.Command("service", "motion", "start")
         err := cmd.Run()
         if err != nil {
-            log.Println(err)
+            logger.Println(err)
         } else {
-            log.Println("Stop motion from motion-control")
+            logger.Println("Motion has been started")
         }
         http.Redirect(res, req, "/", http.StatusSeeOther)
     })
