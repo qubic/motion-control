@@ -21,6 +21,7 @@ func main() {
     m := martini.Classic()
     m.Map(logger)
     m.Use(render.Renderer())
+    m.Use(martini.Static("assets"))
     m.Get("/", func(r render.Render) {
         if _, err := os.Stat(motionPidFile); err == nil {
             r.HTML(200, "status", map[string]interface{}{"motionStatus": "running", "availableAction": "stop"})
@@ -50,4 +51,3 @@ func main() {
     })
     m.Run()
 }
-
